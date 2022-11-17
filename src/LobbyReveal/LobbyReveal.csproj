@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <TargetFrameworks>net48;net7.0</TargetFrameworks>
+        <LangVersion>preview</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.2-beta3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Ekko">
+        <HintPath>..\..\deps\Ekko.dll</HintPath>
+      </Reference>
+      <Reference Include="System.Net.Http" />
+    </ItemGroup>
+
+</Project>

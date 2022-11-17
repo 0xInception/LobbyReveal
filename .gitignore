@@ -1,0 +1,8 @@
+bin/
+obj/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+.vs
+.idea
+LobbyReveal.sln.DotSettings.user
