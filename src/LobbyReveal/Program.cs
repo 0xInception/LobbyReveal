@@ -78,6 +78,7 @@ namespace LobbyReveal
                     }
                     _update = false;
                 }
+                Thread.Sleep(2000);
             }
         }
     }
