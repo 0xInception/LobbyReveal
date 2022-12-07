@@ -19,4 +19,19 @@ namespace LobbyReveal
     {
         public List<Participant> participants { get; set; }
     }
+
+    public class Userinfo
+    {
+        public string userinfo { get; set; }
+    }
+    public class Lol
+    {
+        public string cpid { get; set; }
+    }
+
+    public class UserinfoActual
+    {
+        public Lol lol { get; set; }
+        
+    }
 }
