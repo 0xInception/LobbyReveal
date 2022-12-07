@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using Ekko;
 using Newtonsoft.Json;
 
@@ -72,6 +73,7 @@ namespace LobbyReveal
                         Console.WriteLine("-------------------------------");
                         Console.WriteLine($"Client {i+1} (press {i+1} to open opgg)");
                         Console.WriteLine($"Current summoners: {string.Join(",", _handlers[i].GetSummoners())}");
+                        Console.WriteLine($"Current summoners encoded: {HttpUtility.UrlEncode(string.Join(",", _handlers[i].GetSummoners()))}");
                         Console.WriteLine();
                     }
                     _update = false;
