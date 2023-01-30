@@ -3,7 +3,7 @@
 ## Example
 ![image](https://cdn.discordapp.com/attachments/882326156613910528/1042791430059475005/image.png)
 ## Where can i download the compiled version?
-Head over to [releases](https://github.com/Riotphobia/LobbyReveal/releases/tag/1.0.0)
+Head over to [releases](https://github.com/Riotphobia/LobbyReveal/releases/)
 ## How can i compile it for myself?
 * .NET Framework 4.8 which only works for windows
 * .NET 7.0 which works for windows, macos and linux!
