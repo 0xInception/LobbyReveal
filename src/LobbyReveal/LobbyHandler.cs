@@ -51,6 +51,8 @@ public class LobbyHandler
         _cache = Array.Empty<string>();
     }
     public OnUpdate OnUpdate; 
+    public EventHandler OnError; 
+
 
     public void Start()
     {
@@ -76,49 +78,61 @@ public class LobbyHandler
             Thread.Sleep(2000);
             if (_region is null)
             {
-                var z = await _api.SendAsync(HttpMethod.Get, "/rso-auth/v1/authorization/userinfo");
-                if (string.IsNullOrWhiteSpace(z))
-                    continue;
+                try
+                {
+                    var z = await _api.SendAsync(HttpMethod.Get, "/rso-auth/v1/authorization/userinfo");
+                    if (string.IsNullOrWhiteSpace(z))
+                        continue;
 
-                var resp1 = JsonConvert.DeserializeObject<Userinfo>(z);
-                if (resp1 is null)
-                {
-                    continue;
-                }
+                    var resp1 = JsonConvert.DeserializeObject<Userinfo>(z);
+                    if (resp1 is null)
+                    {
+                        continue;
+                    }
 
-                var resp2 = JsonConvert.DeserializeObject<UserinfoActual>(resp1.userinfo);
-                if (resp2 is null)
-                {
-                    continue;
-                }
+                    var resp2 = JsonConvert.DeserializeObject<UserinfoActual>(resp1.userinfo);
+                    if (resp2 is null)
+                    {
+                        continue;
+                    }
 
-                var reg = Enum.TryParse(resp2.lol.cpid, out Platform region);
-                if (!reg)
-                {
-                    Console.WriteLine("Could not figure out region. Setting EUW");
-                    _region = Region.EUW;
+                    var reg = Enum.TryParse(resp2.lol.cpid, out Platform region);
+                    if (!reg)
+                    {
+                        Console.WriteLine("Could not figure out region. Setting EUW");
+                        _region = Region.EUW;
+                    }
+                    else
+                    {
+                        _region = (Region)region;
+                    }
+
+
+                    var participants = await _api.SendAsync(HttpMethod.Get, "/chat/v5/participants/champ-select");
+                    if (string.IsNullOrWhiteSpace(participants))
+                        continue;
+
+                    var participantsJson = JsonConvert.DeserializeObject<Participants>(participants);
+                    if (participantsJson is null)
+                        continue;
+
+                    var names = participantsJson.participants.Select(x => x.name).ToArray();
+
+                    if (!_cache.SequenceEqual(names))
+                    {
+                        _cache = names;
+                        OnUpdate?.Invoke(this, names);
+                    }
                 }
-                else
+                catch(Exception ex)
                 {
-                    _region = (Region)region;
+                    Console.WriteLine(ex.ToString());
+                    OnError?.Invoke(this,EventArgs.Empty);
+                    break;
                 }
             }
-
-            var participants = await _api.SendAsync(HttpMethod.Get, "/chat/v5/participants/champ-select");
-            if (string.IsNullOrWhiteSpace(participants))
-                continue;
-
-            var participantsJson = JsonConvert.DeserializeObject<Participants>(participants);
-            if (participantsJson is null)
-                continue;
-
-            var names = participantsJson.participants.Select(x => x.name).ToArray();
-
-            if (!_cache.SequenceEqual(names))
-            {
-                _cache = names;
-                OnUpdate?.Invoke(this,names);
-            }
+           
         }
+        
     }
 }

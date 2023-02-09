@@ -3,19 +3,18 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <ImplicitUsings>disable</ImplicitUsings>
-        <TargetFrameworks>net48;net7.0</TargetFrameworks>
         <LangVersion>preview</LangVersion>
         <Nullable>enable</Nullable>
+        <TargetFrameworks>net48;net7.0</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Ekko" Version="1.0.3" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.2-beta3" />
+      <PackageReference Include="Spectre.Console" Version="0.46.1-preview.0.6" />
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="Ekko">
-        <HintPath>..\..\deps\Ekko.dll</HintPath>
-      </Reference>
       <Reference Include="System.Net.Http" />
       <Reference Include="System.Web" />
     </ItemGroup>

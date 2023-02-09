@@ -4,12 +4,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Ekko;
 using Newtonsoft.Json;
+using Spectre.Console;
 
 namespace LobbyReveal
 {
@@ -20,14 +22,16 @@ namespace LobbyReveal
 
         public async static Task Main(string[] args)
         {
+            Console.Title = "notepad";
             var watcher = new LeagueClientWatcher();
             watcher.OnLeagueClient += (clientWatcher, client) =>
             {
-                Console.WriteLine(client.Pid);
+                /*Console.WriteLine(client.Pid);*/
                 var handler = new LobbyHandler(new LeagueApi(client.ClientAuthInfo.RiotClientAuthToken,
                     client.ClientAuthInfo.RiotClientPort));
                 _handlers.Add(handler);
                 handler.OnUpdate += (lobbyHandler, names) => { _update = true; };
+                handler.OnError += (sender, eventArgs) => { _handlers.Remove(handler); };
                 handler.Start();
                 _update = true;
             };
@@ -44,8 +48,8 @@ namespace LobbyReveal
 
             while (true)
             {
-                var input = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(input) || !int.TryParse(input, out var i) || i > _handlers.Count || i < 1)
+                var input = Console.ReadKey(true);
+                if (!int.TryParse(input.KeyChar.ToString(), out var i) || i > _handlers.Count || i < 1)
                 {
                     Console.WriteLine("Invalid input.");
                     continue;
@@ -53,8 +57,21 @@ namespace LobbyReveal
 
                 var region = _handlers[i - 1].GetRegion();
 
-                Process.Start(
-                    $"https://www.op.gg/multisearch/{region ?? Region.EUW}?summoners={string.Join(",", _handlers[i - 1].GetSummoners())}");
+                var link =
+                    $"https://www.op.gg/multisearch/{region ?? Region.EUW}?summoners=" +
+                    HttpUtility.UrlEncode($"{string.Join(",", _handlers[i - 1].GetSummoners())}");
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    Process.Start(link);
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    Process.Start("xdg-open", link);
+                }
+                else
+                {
+                    Process.Start("open", link);
+                }
 
                 _update = true;
             }
@@ -68,16 +85,34 @@ namespace LobbyReveal
                 if (_update)
                 {
                     Console.Clear();
+                    AnsiConsole.Write(new Markup("[u][yellow]https://www.github.com/Riotphobia/LobbyReveal[/][/]")
+                        .Centered());
+                    AnsiConsole.Write(new Markup("[u][blue][b]v1.0.1 - 0xInception[/][/][/]").Centered());
+                    Console.WriteLine();
+                    Console.WriteLine();
                     for (int i = 0; i < _handlers.Count; i++)
                     {
-                        Console.WriteLine("-------------------------------");
-                        Console.WriteLine($"Client {i+1} (press {i+1} to open opgg)");
-                        Console.WriteLine($"Current summoners: {string.Join(",", _handlers[i].GetSummoners())}");
-                        Console.WriteLine($"Current summoners encoded: {HttpUtility.UrlEncode(string.Join(",", _handlers[i].GetSummoners()))}");
+                        var link =
+                            $"https://www.op.gg/multisearch/{_handlers[i].GetRegion() ?? Region.EUW}?summoners=" +
+                            HttpUtility.UrlEncode($"{string.Join(",", _handlers[i].GetSummoners())}");
+
+                        AnsiConsole.Write(
+                            new Panel(new Text($"{string.Join('\n', _handlers[i].GetSummoners())}\n\n{link}")
+                                    .LeftJustified())
+                                .Expand()
+                                .SquareBorder()
+                                .Header($"[red]Client {i + 1}[/]"));
                         Console.WriteLine();
                     }
+
+                    Console.WriteLine();
+                    Console.WriteLine();
+                    AnsiConsole.Write(new Markup("[u][cyan][b]Type the client number to open op.gg![/][/][/]")
+                        .LeftJustified());
+                    Console.WriteLine();
                     _update = false;
                 }
+
                 Thread.Sleep(2000);
             }
         }
