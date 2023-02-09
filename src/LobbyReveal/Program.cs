@@ -31,7 +31,6 @@ namespace LobbyReveal
                     client.ClientAuthInfo.RiotClientPort));
                 _handlers.Add(handler);
                 handler.OnUpdate += (lobbyHandler, names) => { _update = true; };
-                handler.OnError += (sender, eventArgs) => { _handlers.Remove(handler); };
                 handler.Start();
                 _update = true;
             };
@@ -52,6 +51,7 @@ namespace LobbyReveal
                 if (!int.TryParse(input.KeyChar.ToString(), out var i) || i > _handlers.Count || i < 1)
                 {
                     Console.WriteLine("Invalid input.");
+                    _update = true;
                     continue;
                 }
 
@@ -72,7 +72,6 @@ namespace LobbyReveal
                 {
                     Process.Start("open", link);
                 }
-
                 _update = true;
             }
 
@@ -97,7 +96,7 @@ namespace LobbyReveal
                             HttpUtility.UrlEncode($"{string.Join(",", _handlers[i].GetSummoners())}");
 
                         AnsiConsole.Write(
-                            new Panel(new Text($"{string.Join('\n', _handlers[i].GetSummoners())}\n\n{link}")
+                            new Panel(new Text($"{string.Join("\n", _handlers[i].GetSummoners())}\n\n{link}")
                                     .LeftJustified())
                                 .Expand()
                                 .SquareBorder()

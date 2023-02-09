@@ -39,6 +39,7 @@ public enum Platform
     JP1
 }
 public delegate void OnUpdate(LobbyHandler handler, string[] names);
+
 public class LobbyHandler
 {
     private readonly LeagueApi _api;
@@ -50,8 +51,9 @@ public class LobbyHandler
         _api = api;
         _cache = Array.Empty<string>();
     }
-    public OnUpdate OnUpdate; 
-    public EventHandler OnError; 
+
+    public OnUpdate OnUpdate;
+    public EventHandler OnError;
 
 
     public void Start()
@@ -71,14 +73,16 @@ public class LobbyHandler
     {
         return _region;
     }
+
     private async Task Loop()
     {
         while (true)
         {
             Thread.Sleep(2000);
-            if (_region is null)
+
+            try
             {
-                try
+                if (_region is null)
                 {
                     var z = await _api.SendAsync(HttpMethod.Get, "/rso-auth/v1/authorization/userinfo");
                     if (string.IsNullOrWhiteSpace(z))
@@ -106,33 +110,35 @@ public class LobbyHandler
                     {
                         _region = (Region)region;
                     }
-
-
-                    var participants = await _api.SendAsync(HttpMethod.Get, "/chat/v5/participants/champ-select");
-                    if (string.IsNullOrWhiteSpace(participants))
-                        continue;
-
-                    var participantsJson = JsonConvert.DeserializeObject<Participants>(participants);
-                    if (participantsJson is null)
-                        continue;
-
-                    var names = participantsJson.participants.Select(x => x.name).ToArray();
-
-                    if (!_cache.SequenceEqual(names))
-                    {
-                        _cache = names;
-                        OnUpdate?.Invoke(this, names);
-                    }
                 }
-                catch(Exception ex)
+
+                var participants = await _api.SendAsync(HttpMethod.Get, "/chat/v5/participants/champ-select");
+                if (string.IsNullOrWhiteSpace(participants))
+                    continue;
+
+                var participantsJson = JsonConvert.DeserializeObject<Participants>(participants);
+                if (participantsJson?.participants is null)
+                    continue;
+
+                var names = participantsJson.participants.Select(x => x.name).ToArray();
+
+                if (!_cache.SequenceEqual(names))
                 {
-                    Console.WriteLine(ex.ToString());
-                    OnError?.Invoke(this,EventArgs.Empty);
-                    break;
+                    _cache = names;
+                    OnUpdate?.Invoke(this, names);
                 }
+
             }
-           
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                OnError?.Invoke(this, EventArgs.Empty);
+                break;
+            }
+
+
         }
-        
+
     }
+
 }

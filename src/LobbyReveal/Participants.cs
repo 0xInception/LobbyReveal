@@ -17,7 +17,7 @@ namespace LobbyReveal
 
     public class Participants
     {
-        public List<Participant> participants { get; set; }
+        public List<Participant>? participants { get; set; }
     }
 
     public class Userinfo
