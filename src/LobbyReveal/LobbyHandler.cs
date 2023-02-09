@@ -21,7 +21,11 @@ public enum Region
     LAS,
     RU,
     BR,
-    JP
+    JP,
+    SG,
+    TW,
+    TH,
+    VN
 }
 
 public enum Platform
@@ -36,7 +40,11 @@ public enum Platform
     LA2,
     RU,
     BR1,
-    JP1
+    JP1,
+    SG2,
+    TW2,
+    TH2,
+    VN2
 }
 public delegate void OnUpdate(LobbyHandler handler, string[] names);
 
