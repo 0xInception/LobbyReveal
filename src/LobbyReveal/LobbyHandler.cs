@@ -21,7 +21,11 @@ public enum Region
     LAS,
     RU,
     BR,
-    JP
+    JP,
+    SG,
+    TW,
+    TH,
+    VN
 }
 
 public enum Platform
