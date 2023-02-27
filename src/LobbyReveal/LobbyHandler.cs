@@ -25,7 +25,8 @@ public enum Region
     SG,
     TW,
     TH,
-    VN
+    VN,
+    PH
 }
 
 public enum Platform
@@ -44,7 +45,8 @@ public enum Platform
     SG2,
     TW2,
     TH2,
-    VN2
+    VN2,
+    PH2
 }
 public delegate void OnUpdate(LobbyHandler handler, string[] names);
 
