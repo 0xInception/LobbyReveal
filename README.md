@@ -1,4 +1,6 @@
 # LobbyReveal
+### Reason for archive
+![image](https://pbs.twimg.com/media/FrxwDhMWwAA-YvK?format=jpg&name=large)
 #### LobbyReveal is a small app that lets you see who is in your lobby.
 ## Example
 ![image](https://cdn.discordapp.com/attachments/881887652155117621/1073273537122549891/image.png)
